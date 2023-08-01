@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"sort"
 )
 
 var view = jet.NewSet(
@@ -28,14 +29,15 @@ type WebSocketConnection struct {
 	*websocket.Conn
 }
 type WsResponse struct {
-	Action      string `json:"action"`
-	Message     string `json:"message"`
-	MessageType string `json:"message_type"`
+	Action        string   `json:"action"`
+	Message       string   `json:"message"`
+	MessageType   string   `json:"message_type"`
+	ConnectedUser []string `json:"connected_user"`
 }
 
 type WsPayLoad struct {
 	Action   string              `json:"action"`
-	UserName string              `json:"user_name"`
+	UserName string              `json:"username"`
 	Message  string              `json:"message"`
 	Conn     WebSocketConnection `json:"-"`
 }
@@ -86,12 +88,32 @@ func ListenToWsChannel() {
 	var response WsResponse
 
 	for {
-		err := <-wsChan
+		channel := <-wsChan
 
-		response.Action = "Got Here"
-		response.Message = fmt.Sprintf("Some message and actione %s", err.Action)
-		broadCastToAll(response)
+		switch channel.Action {
+		case "username":
+			clients[channel.Conn] = channel.UserName
+			users := getUserList()
+
+			response.Action = "list_user"
+			response.ConnectedUser = users
+			broadCastToAll(response)
+		}
+
+		//response.Action = "Got Here"
+		//response.Message = fmt.Sprintf("Some message and actione %s", err.Action)
+		//broadCastToAll(response)
 	}
+}
+
+func getUserList() []string {
+	var userList []string
+	for _, x := range clients {
+		userList = append(userList, x)
+	}
+	sort.Strings(userList)
+
+	return userList
 }
 
 func broadCastToAll(response WsResponse) {

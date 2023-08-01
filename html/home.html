@@ -30,8 +30,7 @@
         </div>
         <div class="col-4">
             <h1>User Online</h1>
-            <ul>
-                <li>User 1</li>
+            <ul id="list-user">
             </ul>
         </div>
     </div>
@@ -55,8 +54,24 @@
         }
 
         socket.onmessage = msg => {
-            console.log(msg.data)
+            let response = JSON.parse(msg.data)
+            let ul = document.getElementById('list-user')
+            switch (response.action) {
+                case 'list_user':
+                    response.connected_user.map((item) => {
+                        let li = document.createElement('li');
+                        li.textContent = item
+                        ul.append(li);
+                    });
+            }
         }
+        let btnSubmit = document.getElementById("username");
+        btnSubmit.addEventListener("change", function (event) {
+            let jsonData = {};
+            jsonData['action'] = 'username';
+            jsonData['username'] = this.value;
+            socket.send(JSON.stringify(jsonData))
+        })
     })
 </script>
 </html>
