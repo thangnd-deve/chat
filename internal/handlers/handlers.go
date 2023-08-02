@@ -100,9 +100,6 @@ func ListenToWsChannel() {
 			broadCastToAll(response)
 		}
 
-		//response.Action = "Got Here"
-		//response.Message = fmt.Sprintf("Some message and actione %s", err.Action)
-		//broadCastToAll(response)
 	}
 }
 
@@ -127,7 +124,7 @@ func broadCastToAll(response WsResponse) {
 	}
 }
 
-func Hom(w http.ResponseWriter, r *http.Request) {
+func Hom(w http.ResponseWriter, _ *http.Request) {
 	err := renderHtml(w, "home.html", nil)
 
 	if err != nil {
