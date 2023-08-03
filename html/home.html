@@ -29,9 +29,7 @@
             </div>
             <div class="row mt-4">
                 <div class="card">
-                    <div class="card-body d-flex">
-                        <h5 class="card-title">ThangND: </h5>&nbsp;
-                        <p class="card-text">Message</p>
+                    <div class="card-body d-flex" id="chat-box">
                     </div>
                 </div>
             </div>
@@ -72,6 +70,14 @@
                         li.textContent = item
                         ul.append(li);
                     });
+                    break;
+                case 'broadcast':
+                    let chatBox = document.getElementById('chat-box');
+
+                    let p = document.createElement('p')
+                    p.innerHTML = response.message
+                    chatBox.appendChild(p)
+                    break;
             }
         }
         let btnSubmit = document.getElementById("username");
@@ -81,6 +87,27 @@
             jsonData['username'] = this.value;
             socket.send(JSON.stringify(jsonData))
         })
+
+        document.getElementById('submit').addEventListener('click', function (event) {
+            if (!socket) {
+                console.log('Not have connection to socket')
+                return false;
+            }
+
+            event.preventDefault();
+
+            sendMessage();
+            return true
+        })
+
+        function sendMessage() {
+            let jsonData = {};
+
+            jsonData['action'] = 'broadcast';
+            jsonData['username'] = document.getElementById('username').value
+            jsonData['message'] = document.getElementById('message').value
+            socket.send(JSON.stringify(jsonData))
+        }
     })
 </script>
 </html>
