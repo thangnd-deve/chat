@@ -58,6 +58,7 @@
             let ul = document.getElementById('list-user')
             switch (response.action) {
                 case 'list_user':
+                    ul.textContent = '';
                     response.connected_user.map((item) => {
                         let li = document.createElement('li');
                         li.textContent = item
